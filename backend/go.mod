@@ -2,8 +2,6 @@ module github.com/create-go-app/fiber-go-template
 
 go 1.24.0
 
-toolchain go1.24.1
-
 require (
 	github.com/go-playground/validator/v10 v10.27.0
 	github.com/go-sql-driver/mysql v1.9.3
@@ -16,6 +14,7 @@ require (
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/joho/godotenv v1.5.1
 	github.com/redis/go-redis/v9 v9.14.0
+	github.com/sashabaranov/go-openai v1.36.0
 	github.com/stretchr/testify v1.11.1
 	github.com/swaggo/swag v1.16.6
 	golang.org/x/crypto v0.42.0

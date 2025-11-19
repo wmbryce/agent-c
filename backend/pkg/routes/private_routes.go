@@ -12,9 +12,10 @@ func PrivateRoutes(a *fiber.App) {
 	route := a.Group("/api/v1")
 
 	// Routes for POST method:
-	route.Post("/book", middleware.JWTProtected(), controllers.CreateBook)           // create a new book
-	route.Post("/user/sign/out", middleware.JWTProtected(), controllers.UserSignOut) // de-authorization user
-	route.Post("/token/renew", middleware.JWTProtected(), controllers.RenewTokens)   // renew Access & Refresh tokens
+	route.Post("/book", middleware.JWTProtected(), controllers.CreateBook)              // create a new book
+	route.Post("/user/sign/out", middleware.JWTProtected(), controllers.UserSignOut)    // de-authorization user
+	route.Post("/token/renew", middleware.JWTProtected(), controllers.RenewTokens)      // renew Access & Refresh tokens
+	route.Post("/openai/chat", middleware.JWTProtected(), controllers.ChatCompletion)   // send chat completion request to OpenAI
 
 	// Routes for PUT method:
 	route.Put("/book", middleware.JWTProtected(), controllers.UpdateBook) // update one book by ID
