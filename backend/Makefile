@@ -49,7 +49,7 @@ docker.fiber: docker.fiber.build
 	docker run --rm -d \
 		--name cgapp-fiber \
 		--network dev-network \
-		-p 5000:5000 \
+		-p 8080:8080 \
 		fiber
 
 docker.postgres:
