@@ -7,6 +7,7 @@ import (
 	"math/big"
 	"os"
 
+	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
@@ -111,7 +112,7 @@ func (ec *EthereumClient) GetTransactOpts() (*bind.TransactOpts, error) {
 		return nil, fmt.Errorf("failed to create transactor: %v", err)
 	}
 
-	auth.Nonce = big.NewInt(int64(nonce))
+	auth.Nonce = new(big.Int).SetUint64(nonce)
 	auth.Value = big.NewInt(0)     // in wei
 	auth.GasLimit = uint64(300000) // default gas limit
 	auth.GasPrice = gasPrice
@@ -143,19 +144,11 @@ func (ec *EthereumClient) GetBlockNumber() (uint64, error) {
 
 // EstimateGas estimates gas for a transaction
 func (ec *EthereumClient) EstimateGas(to common.Address, data []byte) (uint64, error) {
-	msg := types.NewMessage(
-		ec.Address,
-		&to,
-		0,
-		big.NewInt(0),
-		0,
-		big.NewInt(0),
-		big.NewInt(0),
-		big.NewInt(0),
-		data,
-		nil,
-		false,
-	)
+	msg := ethereum.CallMsg{
+		From: ec.Address,
+		To:   &to,
+		Data: data,
+	}
 
 	gasLimit, err := ec.Client.EstimateGas(context.Background(), msg)
 	if err != nil {

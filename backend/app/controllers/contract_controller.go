@@ -131,11 +131,8 @@ func GetTransactionReceipt(c *fiber.Ctx) error {
 		contractAddress = receipt.ContractAddress.Hex()
 	}
 
-	to := ""
-	if receipt.To != nil {
-		to = receipt.To.Hex()
-	}
-
+	// Note: From and To are not in the receipt, would need to fetch the transaction
+	// For now, we'll leave them empty
 	response := models.TransactionReceiptResponse{
 		TxHash:          receipt.TxHash.Hex(),
 		BlockNumber:     receipt.BlockNumber.Uint64(),
@@ -143,8 +140,8 @@ func GetTransactionReceipt(c *fiber.Ctx) error {
 		GasUsed:         receipt.GasUsed,
 		Status:          receipt.Status,
 		ContractAddress: contractAddress,
-		From:            receipt.From.Hex(),
-		To:              to,
+		From:            "",
+		To:              "",
 	}
 
 	return c.JSON(fiber.Map{

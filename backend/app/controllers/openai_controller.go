@@ -91,14 +91,14 @@ func ChatCompletion(c *fiber.Ctx) error {
 
 	// Build response
 	choices := make([]models.Choice, len(resp.Choices))
-	for i, choice := range resp.Choices {
+	for i := range resp.Choices {
 		choices[i] = models.Choice{
-			Index: choice.Index,
+			Index: resp.Choices[i].Index,
 			Message: models.ChatMessage{
-				Role:    choice.Message.Role,
-				Content: choice.Message.Content,
+				Role:    resp.Choices[i].Message.Role,
+				Content: resp.Choices[i].Message.Content,
 			},
-			FinishReason: string(choice.FinishReason),
+			FinishReason: string(resp.Choices[i].FinishReason),
 		}
 	}
 
