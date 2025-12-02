@@ -77,7 +77,7 @@ func ChatCompletion(c *fiber.Ctx) error {
 		openaiReq.Temperature = *request.Temperature
 	}
 	if request.MaxTokens != nil {
-		openaiReq.MaxTokens = *request.MaxTokens
+		openaiReq.MaxCompletionTokens = *request.MaxTokens
 	}
 
 	// Send request to OpenAI API

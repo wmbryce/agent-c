@@ -20,7 +20,7 @@ import (
 // @Success 200 {object} models.ChatCompletionResponse
 // @Security ApiKeyAuth
 // @Router /v1/openai/chat [post]
-func ChatCompletion(c *fiber.Ctx) error {
+func AiChatCompletion(c *fiber.Ctx) error {
 	// Create new ChatCompletionRequest struct
 	request := &models.ChatCompletionRequest{}
 

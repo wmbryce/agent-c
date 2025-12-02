@@ -4,6 +4,7 @@
 # Dev build
 build/
 tmp/
+build-errors.log
 
 # Test
 *.out

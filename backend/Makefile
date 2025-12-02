@@ -1,4 +1,4 @@
-.PHONY: clean critic security lint test build run
+.PHONY: clean critic security lint test build run dev air.install
 
 APP_NAME = apiserver
 BUILD_DIR = $(PWD)/build
@@ -83,3 +83,26 @@ docker.stop.redis:
 
 swag:
 	swag init
+
+# Air hot reload commands
+air.install:
+	go install github.com/air-verse/air@latest
+
+dev: swag
+	air -c .air.toml
+
+# Docker compose commands
+compose.up:
+	docker compose -f ../docker-compose.yml up -d
+
+compose.down:
+	docker compose -f ../docker-compose.yml down
+
+compose.logs:
+	docker compose -f ../docker-compose.yml logs -f backend
+
+compose.restart:
+	docker compose -f ../docker-compose.yml restart backend
+
+compose.rebuild:
+	docker compose -f ../docker-compose.yml up -d --build backend
