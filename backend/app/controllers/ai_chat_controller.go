@@ -19,7 +19,7 @@ import (
 // @Param request body models.ChatCompletionRequest true "Chat completion request"
 // @Success 200 {object} models.ChatCompletionResponse
 // @Security ApiKeyAuth
-// @Router /v1/openai/chat [post]
+// @Router /v1/ai/chat [post]
 func AiChatCompletion(c *fiber.Ctx) error {
 	// Create new ChatCompletionRequest struct
 	request := &models.ChatCompletionRequest{}
@@ -77,7 +77,7 @@ func AiChatCompletion(c *fiber.Ctx) error {
 		openaiReq.Temperature = *request.Temperature
 	}
 	if request.MaxTokens != nil {
-		openaiReq.MaxTokens = *request.MaxTokens
+		openaiReq.MaxCompletionTokens = *request.MaxTokens
 	}
 
 	// Send request to OpenAI API
@@ -122,4 +122,5 @@ func AiChatCompletion(c *fiber.Ctx) error {
 		"response": response,
 	})
 }
+
 

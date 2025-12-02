@@ -10,9 +10,7 @@ func PublicRoutes(a *fiber.App) {
 	// Create routes group.
 	route := a.Group("/api/v1")
 
-	route.Post("/openai/chat", controllers.ChatCompletion)   // send chat completion request to OpenAI
+	// route.Post("/ai/chat", controllers.ChatCompletion)   // send chat completion request to OpenAI
+	route.Post("/ai/chat", controllers.AiChatCompletion)   // send chat completion request to OpenAI
 
-	// Routes for POST method:
-	route.Post("/user/sign/up", controllers.UserSignUp) // register a new user
-	route.Post("/user/sign/in", controllers.UserSignIn) // auth, return Access & Refresh tokens
 }
