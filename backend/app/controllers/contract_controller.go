@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"math/big"
 
-	"github.com/create-go-app/fiber-go-template/app/models"
-	"github.com/create-go-app/fiber-go-template/pkg/utils"
-	"github.com/create-go-app/fiber-go-template/platform/blockchain"
 	"github.com/gofiber/fiber/v2"
+	"github.com/wmbryce/agent-c/app/store/blockchain"
+	"github.com/wmbryce/agent-c/app/types"
+	"github.com/wmbryce/agent-c/app/utils"
 )
 
 // GetBalance func gets the ETH balance of an address.
@@ -22,7 +22,7 @@ import (
 // @Router /v1/blockchain/balance [post]
 func GetBalance(c *fiber.Ctx) error {
 	// Create new GetBalanceRequest struct
-	request := &models.GetBalanceRequest{}
+	request := &types.GetBalanceRequest{}
 
 	// Check, if received JSON data is valid.
 	if err := c.BodyParser(request); err != nil {
@@ -63,7 +63,7 @@ func GetBalance(c *fiber.Ctx) error {
 	// Convert to ETH
 	balanceEth := utils.WeiToEth(balance)
 
-	response := models.GetBalanceResponse{
+	response := types.GetBalanceResponse{
 		Address:    request.Address,
 		Balance:    balance.String(),
 		BalanceEth: balanceEth.Text('f', 18),
@@ -88,7 +88,7 @@ func GetBalance(c *fiber.Ctx) error {
 // @Router /v1/blockchain/receipt [post]
 func GetTransactionReceipt(c *fiber.Ctx) error {
 	// Create new TransactionReceiptRequest struct
-	request := &models.TransactionReceiptRequest{}
+	request := &types.TransactionReceiptRequest{}
 
 	// Check, if received JSON data is valid.
 	if err := c.BodyParser(request); err != nil {
@@ -133,7 +133,7 @@ func GetTransactionReceipt(c *fiber.Ctx) error {
 
 	// Note: From and To are not in the receipt, would need to fetch the transaction
 	// For now, we'll leave them empty
-	response := models.TransactionReceiptResponse{
+	response := types.TransactionReceiptResponse{
 		TxHash:          receipt.TxHash.Hex(),
 		BlockNumber:     receipt.BlockNumber.Uint64(),
 		BlockHash:       receipt.BlockHash.Hex(),
@@ -180,7 +180,7 @@ func GetBlockInfo(c *fiber.Ctx) error {
 		})
 	}
 
-	response := models.BlockInfoResponse{
+	response := types.BlockInfoResponse{
 		BlockNumber: blockNumber,
 		ChainID:     ethClient.ChainID.Int64(),
 	}

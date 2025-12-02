@@ -1,0 +1,5 @@
+-- Delete tables
+DROP TABLE IF EXISTS api_keys;
+DROP TABLE IF EXISTS models;
+DROP TABLE IF EXISTS owners;
+DROP TABLE IF EXISTS consumers;

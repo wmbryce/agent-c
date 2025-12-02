@@ -1,13 +1,9 @@
 package controllers
 
 import (
-	"context"
-	"os"
-
-	"github.com/create-go-app/fiber-go-template/app/models"
-	"github.com/create-go-app/fiber-go-template/pkg/utils"
 	"github.com/gofiber/fiber/v2"
-	openai "github.com/sashabaranov/go-openai"
+	"github.com/wmbryce/agent-c/app/types"
+	"github.com/wmbryce/agent-c/app/utils"
 )
 
 // ChatCompletion func sends a chat completion request to OpenAI API.
@@ -22,96 +18,29 @@ import (
 // @Router /v1/ai/chat [post]
 func AiChatCompletion(c *fiber.Ctx) error {
 	// Create new ChatCompletionRequest struct
-	request := &models.ChatCompletionRequest{}
-
-	// Check, if received JSON data is valid.
+	request := &types.ChatCompletionRequest{}
 	if err := c.BodyParser(request); err != nil {
-		// Return status 400 and error message.
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": true,
 			"msg":   err.Error(),
 		})
 	}
 
-	// Create a new validator for a ChatCompletionRequest model.
 	validate := utils.NewValidator()
-
-	// Validate request fields.
-	if err := validate.Struct(request); err != nil {
-		// Return, if some fields are not valid.
+	if err := validate.Struct(&request); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": true,
 			"msg":   utils.ValidatorErrors(err),
 		})
 	}
 
-	// Get OpenAI API key from environment variable
-	apiKey := os.Getenv("OPENAI_API_KEY")
-	if apiKey == "" {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": true,
-			"msg":   "OPENAI_API_KEY environment variable is not set",
-		})
-	}
-
-	// Create OpenAI client
-	client := openai.NewClient(apiKey)
-
-	// Build messages for OpenAI API
-	messages := make([]openai.ChatCompletionMessage, len(request.Messages))
-	for i, msg := range request.Messages {
-		messages[i] = openai.ChatCompletionMessage{
-			Role:    msg.Role,
-			Content: msg.Content,
-		}
-	}
-
-	// Build OpenAI request
-	openaiReq := openai.ChatCompletionRequest{
-		Model:    request.Model,
-		Messages: messages,
-	}
-
-	// Add optional parameters
-	if request.Temperature != nil {
-		openaiReq.Temperature = *request.Temperature
-	}
-	if request.MaxTokens != nil {
-		openaiReq.MaxCompletionTokens = *request.MaxTokens
-	}
-
-	// Send request to OpenAI API
-	resp, err := client.CreateChatCompletion(context.Background(), openaiReq)
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": true,
-			"msg":   err.Error(),
-		})
-	}
-
-	// Build response
-	choices := make([]models.Choice, len(resp.Choices))
-	for i := range resp.Choices {
-		choices[i] = models.Choice{
-			Index: resp.Choices[i].Index,
-			Message: models.ChatMessage{
-				Role:    resp.Choices[i].Message.Role,
-				Content: resp.Choices[i].Message.Content,
-			},
-			FinishReason: string(resp.Choices[i].FinishReason),
-		}
-	}
-
-	response := models.ChatCompletionResponse{
-		ID:      resp.ID,
-		Object:  resp.Object,
-		Created: resp.Created,
-		Model:   resp.Model,
-		Choices: choices,
-		Usage: models.Usage{
-			PromptTokens:     resp.Usage.PromptTokens,
-			CompletionTokens: resp.Usage.CompletionTokens,
-			TotalTokens:      resp.Usage.TotalTokens,
+	response := types.ChatCompletionResponse{
+		ID:      "123",
+		Object:  "chat.completion",
+		Created: 1717334400,
+		Model:   "gpt-4o",
+		Choices: []types.Choice{
+			{Index: 0, Message: types.ChatMessage{Role: "assistant", Content: "Hello, how can I help you today?"}},
 		},
 	}
 

@@ -1,7 +1,7 @@
-package models
+package types
 
 // ChatCompletionRequest struct to describe chat completion request object.
-type ChatCompletionRequest struct {
+type OpenAIChatCompletionRequest struct {
 	Model       string          `json:"model" validate:"required"`
 	Messages    []ChatMessage   `json:"messages" validate:"required,min=1,dive"`
 	Temperature *float32        `json:"temperature,omitempty" validate:"omitempty,min=0,max=2"`

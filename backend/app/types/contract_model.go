@@ -1,4 +1,4 @@
-package models
+package types
 
 // ContractCallRequest struct for read-only contract calls
 type ContractCallRequest struct {

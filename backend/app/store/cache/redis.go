@@ -4,7 +4,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/create-go-app/fiber-go-template/pkg/utils"
+	"github.com/wmbryce/agent-c/app/utils"
 
 	"github.com/redis/go-redis/v9"
 )

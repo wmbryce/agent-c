@@ -4,10 +4,10 @@ import (
 	"context"
 	"os"
 
-	"github.com/create-go-app/fiber-go-template/app/models"
-	"github.com/create-go-app/fiber-go-template/pkg/utils"
 	"github.com/gofiber/fiber/v2"
 	openai "github.com/sashabaranov/go-openai"
+	"github.com/wmbryce/agent-c/app/types"
+	"github.com/wmbryce/agent-c/app/utils"
 )
 
 // ChatCompletion func sends a chat completion request to OpenAI API.
@@ -16,13 +16,13 @@ import (
 // @Tags OpenAI
 // @Accept json
 // @Produce json
-// @Param request body models.ChatCompletionRequest true "Chat completion request"
-// @Success 200 {object} models.ChatCompletionResponse
+// @Param request body types.ChatCompletionRequest true "Chat completion request"
+// @Success 200 {object} types.ChatCompletionResponse
 // @Security ApiKeyAuth
 // @Router /v1/openai/chat [post]
 func ChatCompletion(c *fiber.Ctx) error {
 	// Create new ChatCompletionRequest struct
-	request := &models.ChatCompletionRequest{}
+	request := &types.ChatCompletionRequest{}
 
 	// Check, if received JSON data is valid.
 	if err := c.BodyParser(request); err != nil {
@@ -68,16 +68,16 @@ func ChatCompletion(c *fiber.Ctx) error {
 
 	// Build OpenAI request
 	openaiReq := openai.ChatCompletionRequest{
-		Model:    request.Model,
+		Model:    request.ModelKey,
 		Messages: messages,
 	}
 
 	// Add optional parameters
-	if request.Temperature != nil {
-		openaiReq.Temperature = *request.Temperature
+	if request.Options["temperature"] != nil {
+		openaiReq.Temperature = request.Options["temperature"].(float32)
 	}
-	if request.MaxTokens != nil {
-		openaiReq.MaxCompletionTokens = *request.MaxTokens
+	if request.Options["max_tokens"] != nil {
+		openaiReq.MaxCompletionTokens = request.Options["max_tokens"].(int)
 	}
 
 	// Send request to OpenAI API
@@ -90,11 +90,11 @@ func ChatCompletion(c *fiber.Ctx) error {
 	}
 
 	// Build response
-	choices := make([]models.Choice, len(resp.Choices))
+	choices := make([]types.Choice, len(resp.Choices))
 	for i := range resp.Choices {
-		choices[i] = models.Choice{
+		choices[i] = types.Choice{
 			Index: resp.Choices[i].Index,
-			Message: models.ChatMessage{
+			Message: types.ChatMessage{
 				Role:    resp.Choices[i].Message.Role,
 				Content: resp.Choices[i].Message.Content,
 			},
@@ -102,13 +102,13 @@ func ChatCompletion(c *fiber.Ctx) error {
 		}
 	}
 
-	response := models.ChatCompletionResponse{
+	response := types.ChatCompletionResponse{
 		ID:      resp.ID,
 		Object:  resp.Object,
 		Created: resp.Created,
 		Model:   resp.Model,
 		Choices: choices,
-		Usage: models.Usage{
+		Usage: types.Usage{
 			PromptTokens:     resp.Usage.PromptTokens,
 			CompletionTokens: resp.Usage.CompletionTokens,
 			TotalTokens:      resp.Usage.TotalTokens,
