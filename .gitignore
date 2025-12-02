@@ -1,19 +1,13 @@
-# A default .gitignore for Create Go App project.
-# Author: Vic Shóstak <koddr.me@gmail.com> (https://github.com/koddr)
-# For more information, please visit https://github.com/create-go-app/cli
-
 # macOS
-**/.DS_store
+**/.DS_Store
 
-# Go builds
-**/build/
-
-# Temporary files
+# Dev build
+build/
 tmp/
+build-errors.log
 
-# Node.js dependencies
-**/node_modules/
-
-# Files
-hosts.ini
+# Test
 *.out
+
+# Environment variables
+.env

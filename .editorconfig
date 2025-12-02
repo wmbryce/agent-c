@@ -1,7 +1,3 @@
-# A default .editorconfig for Create Go App project.
-# Author: Vic Shóstak <koddr.me@gmail.com> (https://github.com/koddr)
-# For more information, please visit https://github.com/create-go-app/cli
-
 root = true
 
 [*]
@@ -15,6 +11,6 @@ insert_final_newline = true
 indent_style = tab
 indent_size = 4
 
-[{Dockerfile,Makefile,*.yml,*.yaml}]
+[{Makefile,Dockerfile,*.yml,*.yaml}]
 indent_style = tab
 indent_size = 2
