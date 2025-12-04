@@ -1,9 +1,10 @@
-.PHONY: clean critic security lint test build run dev air.install
+.PHONY: clean critic security lint test build run dev air.install goose.up goose.down goose.status goose.create goose.reset
 
 APP_NAME = apiserver
 BUILD_DIR = $(PWD)/build
-MIGRATIONS_FOLDER = $(PWD)/platform/migrations
+MIGRATIONS_DIR = $(PWD)/migrations
 DATABASE_URL = postgres://postgres:password@cgapp-postgres/postgres?sslmode=disable
+GOOSE = goose -dir $(MIGRATIONS_DIR) postgres "$(DATABASE_URL)"
 
 clean:
 	rm -rf ./build
@@ -27,16 +28,22 @@ build: test
 run: swag build
 	$(BUILD_DIR)/$(APP_NAME)
 
-migrate.up:
-	migrate -path $(MIGRATIONS_FOLDER) -database "$(DATABASE_URL)" up
+goose.up:
+	$(GOOSE) up
 
-migrate.down:
-	migrate -path $(MIGRATIONS_FOLDER) -database "$(DATABASE_URL)" down
+goose.down:
+	$(GOOSE) down
 
-migrate.force:
-	migrate -path $(MIGRATIONS_FOLDER) -database "$(DATABASE_URL)" force $(version)
+goose.status:
+	$(GOOSE) status
 
-docker.run: docker.network docker.postgres swag docker.fiber docker.redis migrate.up
+goose.create:
+	$(GOOSE) create $(name) sql
+
+goose.reset:
+	$(GOOSE) reset
+
+docker.run: docker.network docker.postgres swag docker.fiber docker.redis goose.up
 
 docker.network:
 	docker network inspect dev-network >/dev/null 2>&1 || \

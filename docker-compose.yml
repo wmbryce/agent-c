@@ -9,7 +9,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - postgres-data:/var/lib/postgresql
     networks:
       - dev-network
     healthcheck:
@@ -33,14 +33,13 @@ services:
 
   backend:
     build:
-      context: ./backend
       dockerfile: Dockerfile.dev
     container_name: agc-service
     ports:
       - "8080:8080"
     volumes:
-      # Mount the backend directory for hot reloading
-      - ./backend:/app
+      # Mount the project directory for hot reloading
+      - .:/app
       # Mount go modules cache to speed up rebuilds
       - go-modules:/go/pkg/mod
     environment:

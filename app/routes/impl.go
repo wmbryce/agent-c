@@ -2,14 +2,15 @@ package routes
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/wmbryce/agent-c/app/controllers"
+	"github.com/wmbryce/agent-c/app/service"
 
 	swagger "github.com/gofiber/swagger"
 )
 
 func SetupRoutes(app *fiber.App) {
 	v1 := app.Group("api/v1")
-	v1.Post("/ai/chat", controllers.AiChatCompletion)
+	v1.Get("/ai/models", service.GetModels)
+	v1.Post("/ai/chat", service.AiChatCompletion)
 
 	// Routes for GET method:
 	swaggerRoute := app.Group("/swagger")
