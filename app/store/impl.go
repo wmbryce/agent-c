@@ -10,6 +10,7 @@ import (
 type SqlStore interface {
 	CreateModel(model *types.Model) (*types.Model, error)
 	GetModels() ([]types.Model, error)
+	Close()
 }
 
 func NewSqlStore(ctx context.Context) SqlStore {

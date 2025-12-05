@@ -2,13 +2,12 @@ package service
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/wmbryce/agent-c/app/store"
 	"github.com/wmbryce/agent-c/app/types"
 	"github.com/wmbryce/agent-c/app/utils"
 )
 
-func GetModels(c *fiber.Ctx) error {
-	models, err := store.GetModels()
+func (s *Service) GetModels(c *fiber.Ctx) error {
+	models, err := s.store.GetModels()
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": true,
@@ -23,7 +22,7 @@ func GetModels(c *fiber.Ctx) error {
 	})
 }
 
-func CreateModel(c *fiber.Ctx) error {
+func (s *Service) CreateModel(c *fiber.Ctx) error {
 	model := &types.Model{}
 	if err := c.BodyParser(model); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -40,7 +39,7 @@ func CreateModel(c *fiber.Ctx) error {
 		})
 	}
 
-	createdModel, err := store.CreateModel(model)
+	createdModel, err := s.store.CreateModel(model)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": true,

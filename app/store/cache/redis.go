@@ -4,10 +4,13 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/wmbryce/agent-c/app/utils"
-
 	"github.com/redis/go-redis/v9"
+	"github.com/wmbryce/agent-c/app/utils"
 )
+
+type cache struct {
+	redis.Engine
+}
 
 // RedisConnection func for connect to Redis server.
 func RedisConnection() (*redis.Client, error) {
