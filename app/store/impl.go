@@ -1,13 +1,17 @@
 package store
 
 import (
-	"github.com/jackc/pgx/v5"
+	"context"
+
+	"github.com/wmbryce/agent-c/app/store/postgres"
+	"github.com/wmbryce/agent-c/app/types"
 )
 
-type Store struct {
-	db *pgx.Conn
+type SqlStore interface {
+	CreateModel(model *types.Model) (*types.Model, error)
+	GetModels() ([]types.Model, error)
 }
 
-func NewStore(db *pgx.Conn) *Store {
-	return &Store{db: db}
+func NewSqlStore(ctx context.Context) SqlStore {
+	return postgres.New(ctx)
 }

@@ -1,10 +1,13 @@
 package main
 
 import (
+	"log"
 	"os"
 
 	"github.com/wmbryce/agent-c/app/middleware"
 	"github.com/wmbryce/agent-c/app/routes"
+	"github.com/wmbryce/agent-c/app/store"
+	"github.com/wmbryce/agent-c/app/store/postgres"
 	"github.com/wmbryce/agent-c/app/utils"
 	"github.com/wmbryce/agent-c/cmd/configs"
 
@@ -28,6 +31,16 @@ import (
 // @in header
 // @name Authorization
 func main() {
+	// Connect to PostgreSQL
+	pool, err := postgres.PostgresConnection()
+	if err != nil {
+		log.Fatalf("failed to connect to postgres: %v", err)
+	}
+	defer pool.Close()
+
+	// Initialize the global store
+	store.Init(pool)
+
 	// Define Fiber config.
 	config := configs.FiberConfig()
 
@@ -38,7 +51,7 @@ func main() {
 	middleware.FiberMiddleware(app) // Register Fiber's middleware for app.
 
 	// Routes.
-	routes.SetupRoutes(app)  // Register a route for API Docs (Swagger).
+	routes.SetupRoutes(app) // Register a route for API Docs (Swagger).
 
 	// Start server (with or without graceful shutdown).
 	if os.Getenv("STAGE_STATUS") == "dev" {

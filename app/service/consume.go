@@ -16,7 +16,7 @@ import (
 // @Success 200 {object} models.ChatCompletionResponse
 // @Security ApiKeyAuth
 // @Router /v1/ai/chat [post]
-func AiChatCompletion(c *fiber.Ctx) error {
+func ConsumeModel(c *fiber.Ctx) error {
 	// Create new ChatCompletionRequest struct
 	request := &types.ChatCompletionRequest{}
 	if err := c.BodyParser(request); err != nil {
