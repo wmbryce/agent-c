@@ -1,21 +1,21 @@
 package main
 
 import (
-	"log"
+	"context"
 	"os"
 
+	"github.com/gofiber/fiber/v2"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 	"github.com/wmbryce/agent-c/app/middleware"
 	"github.com/wmbryce/agent-c/app/routes"
+	"github.com/wmbryce/agent-c/app/service"
 	"github.com/wmbryce/agent-c/app/store"
-	"github.com/wmbryce/agent-c/app/store/postgres"
 	"github.com/wmbryce/agent-c/app/utils"
 	"github.com/wmbryce/agent-c/cmd/configs"
 
-	"github.com/gofiber/fiber/v2"
-
-	_ "github.com/wmbryce/agent-c/docs" // load API Docs files (Swagger)
-
-	_ "github.com/joho/godotenv/autoload" // load .env file automatically
+	_ "github.com/joho/godotenv/autoload"
+	_ "github.com/wmbryce/agent-c/docs"
 )
 
 // @title API
@@ -31,29 +31,19 @@ import (
 // @in header
 // @name Authorization
 func main() {
-	// Connect to PostgreSQL
-	pool, err := postgres.PostgresConnection()
-	if err != nil {
-		log.Fatalf("failed to connect to postgres: %v", err)
-	}
-	defer pool.Close()
+	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
+	logger := log.Output(zerolog.ConsoleWriter{Out: os.Stdout})
 
-	// Initialize the global store
-	store.Init(pool)
+	ctx := context.Background()
+	sqlStore := store.NewSqlStore(ctx)
+	defer sqlStore.Close()
 
-	// Define Fiber config.
-	config := configs.FiberConfig()
+	app := fiber.New(configs.FiberConfig())
+	middleware.FiberMiddleware(app)
 
-	// Define a new Fiber app with config.
-	app := fiber.New(config)
+	svc := service.New(&logger, sqlStore, app)
+	routes.New(svc).Setup(app)
 
-	// Middlewares.
-	middleware.FiberMiddleware(app) // Register Fiber's middleware for app.
-
-	// Routes.
-	routes.SetupRoutes(app) // Register a route for API Docs (Swagger).
-
-	// Start server (with or without graceful shutdown).
 	if os.Getenv("STAGE_STATUS") == "dev" {
 		utils.StartServer(app)
 	} else {

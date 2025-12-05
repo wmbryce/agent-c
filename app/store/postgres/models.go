@@ -6,16 +6,13 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/wmbryce/agent-c/app/types"
 )
 
-// CreateModel inserts a new model into the database
-func CreateModel(pool *pgxpool.Pool, model *types.Model) (*types.Model, error) {
+func (s *Store) CreateModel(model *types.Model) (*types.Model, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	// Generate UUID if not provided
 	if model.ID == "" {
 		model.ID = uuid.New().String()
 	}
@@ -27,7 +24,7 @@ func CreateModel(pool *pgxpool.Pool, model *types.Model) (*types.Model, error) {
 	`
 
 	var createdModel types.Model
-	err := pool.QueryRow(ctx, query,
+	err := s.db.QueryRow(ctx, query,
 		model.ID,
 		model.ModelKey,
 		model.Name,
@@ -49,7 +46,6 @@ func CreateModel(pool *pgxpool.Pool, model *types.Model) (*types.Model, error) {
 		return nil, fmt.Errorf("failed to create model: %w", err)
 	}
 
-	// Copy over the fields we inserted but didn't return
 	createdModel.Name = model.Name
 	createdModel.Description = model.Description
 	createdModel.ProviderID = model.ProviderID
@@ -59,8 +55,7 @@ func CreateModel(pool *pgxpool.Pool, model *types.Model) (*types.Model, error) {
 	return &createdModel, nil
 }
 
-// GetModels retrieves all models from the database
-func GetModels(pool *pgxpool.Pool) ([]types.Model, error) {
+func (s *Store) GetModels() ([]types.Model, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -70,7 +65,7 @@ func GetModels(pool *pgxpool.Pool) ([]types.Model, error) {
 		ORDER BY created_at DESC
 	`
 
-	rows, err := pool.Query(ctx, query)
+	rows, err := s.db.Query(ctx, query)
 	if err != nil {
 		return nil, fmt.Errorf("failed to query models: %w", err)
 	}
@@ -103,4 +98,3 @@ func GetModels(pool *pgxpool.Pool) ([]types.Model, error) {
 
 	return models, nil
 }
-
