@@ -44,6 +44,7 @@ services:
       - go-modules:/go/pkg/mod
     environment:
       - STAGE_STATUS=dev
+      - SERVER_PORT=8080
       - DB_HOST=postgres
       - DB_PORT=5432
       - DB_USER=postgres
