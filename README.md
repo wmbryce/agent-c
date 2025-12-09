@@ -1,113 +1,309 @@
-# Fiber backend template for [Create Go App CLI](https://github.com/create-go-app/cli)
+# Agent-C
 
-<img src="https://img.shields.io/badge/Go-1.19+-00ADD8?style=for-the-badge&logo=go" alt="go version" />&nbsp;<a href="https://goreportcard.com/report/github.com/create-go-app/fiber-go-template" target="_blank"><img src="https://img.shields.io/badge/Go_report-A+-success?style=for-the-badge&logo=none" alt="go report" /></a>&nbsp;<img src="https://img.shields.io/badge/license-Apache_2.0-red?style=for-the-badge&logo=none" alt="license" />
+An AI model aggregation and blockchain integration platform built with Go and Fiber.
 
-[Fiber](https://gofiber.io/) is an Express.js inspired web framework build on top of Fasthttp, the fastest HTTP engine for Go. Designed to ease things up for **fast** development with **zero memory allocation** and **performance** in mind.
+<img src="https://img.shields.io/badge/Go-1.25+-00ADD8?style=for-the-badge&logo=go" alt="go version" />&nbsp;<img src="https://img.shields.io/badge/license-Apache_2.0-red?style=for-the-badge&logo=none" alt="license" />
 
-## ⚡️ Quick start
+Agent-C provides a unified API for interacting with multiple AI model providers while managing access through blockchain-based authentication and payment systems.
 
-1. Create a new project with Fiber:
+## Features
+
+- **Unified AI Model API** - Single interface for multiple AI providers (OpenAI, and more)
+- **Blockchain Integration** - Ethereum smart contract support with Go bindings
+- **Token-based Access Control** - API key management with token accounting
+- **Multi-provider Support** - Extensible architecture for adding new AI providers
+- **Smart Contract Ready** - ERC20 and custom contract support
+- **Production Ready** - Built with Fiber framework for high performance
+- **Auto-generated API Docs** - Swagger/OpenAPI documentation
+
+## Tech Stack
+
+- **Framework**: [Fiber v2](https://gofiber.io/) - Express-inspired web framework
+- **Database**: PostgreSQL with pgx/v5
+- **Cache**: Redis
+- **Blockchain**: Ethereum via go-ethereum
+- **AI**: OpenAI API integration
+- **Auth**: JWT tokens
+- **Migrations**: Goose
+- **Logging**: zerolog
+- **Validation**: go-playground/validator
+
+## Quick Start
+
+### Prerequisites
+
+- Go 1.25.4+
+- Docker & Docker Compose
+
+### 1. Clone and Configure
 
 ```bash
-cgapp create
-
-# Choose a backend framework:
-#   net/http
-# > fiber
-#   chi
+git clone https://github.com/wmbryce/agent-c.git
+cd agent-c
+cp .env.example .env
+# Edit .env with your configuration
 ```
 
-2. Rename `.env.example` to `.env` and fill it with your environment values.
-3. Install [Docker](https://www.docker.com/get-started) and the following useful Go tools to your system:
-
-   - [golang-migrate/migrate](https://github.com/golang-migrate/migrate#cli-usage) for apply migrations
-   - [github.com/swaggo/swag](https://github.com/swaggo/swag) for auto-generating Swagger API docs
-   - [github.com/securego/gosec](https://github.com/securego/gosec) for checking Go security issues
-   - [github.com/go-critic/go-critic](https://github.com/go-critic/go-critic) for checking Go the best practice issues
-   - [github.com/golangci/golangci-lint](https://github.com/golangci/golangci-lint) for checking Go linter issues
-
-4. Run project by this command:
+### 2. Start with Docker Compose (Recommended)
 
 ```bash
-make docker.run
+# Start all services (PostgreSQL, Redis, Backend)
+make compose.up
+
+# View logs
+make compose.logs
+
+# Stop services
+make compose.down
 ```
 
-5. Go to API Docs page (Swagger): [127.0.0.1:5000/swagger/index.html](http://127.0.0.1:5000/swagger/index.html)
+### 3. Access the API
 
-![Screenshot](https://user-images.githubusercontent.com/11155743/112715187-07dab100-8ef0-11eb-97ea-68d34f2178f6.png)
+- **API**: http://localhost:8080
+- **Swagger Docs**: http://localhost:8080/swagger/index.html
 
-## 🗄 Template structure
+## Development
 
-### ./app
+### Hot Reload Development
 
-**Folder with business logic only**. This directory doesn't care about _what database driver you're using_ or _which caching solution your choose_ or any third-party things.
+```bash
+# Install Air for hot reloading
+make air.install
 
-- `./app/controllers` folder for functional controllers (used in routes)
-- `./app/models` folder for describe business models and methods of your project
-- `./app/queries` folder for describe queries for models of your project
+# Start with hot reload
+make dev
+```
 
-### ./docs
+### Database Migrations
 
-**Folder with API Documentation**. This directory contains config files for auto-generated API Docs by Swagger.
+```bash
+# Apply migrations
+make goose.up
 
-### ./pkg
+# Rollback last migration
+make goose.down
 
-**Folder with project-specific functionality**. This directory contains all the project-specific code tailored only for your business use case, like _configs_, _middleware_, _routes_ or _utils_.
+# Check migration status
+make goose.status
 
-- `./pkg/configs` folder for configuration functions
-- `./pkg/middleware` folder for add middleware (Fiber built-in and yours)
-- `./pkg/repository` folder for describe `const` of your project
-- `./pkg/routes` folder for describe routes of your project
-- `./pkg/utils` folder with utility functions (server starter, error checker, etc)
+# Create new migration
+make goose.create name=migration_name
+```
 
-### ./platform
+### Manual Setup (without Docker Compose)
 
-**Folder with platform-level logic**. This directory contains all the platform-level logic that will build up the actual project, like _setting up the database_ or _cache server instance_ and _storing migrations_.
+```bash
+# Start PostgreSQL and Redis
+make docker.postgres
+make docker.redis
 
-- `./platform/cache` folder with in-memory cache setup functions (by default, Redis)
-- `./platform/database` folder with database setup functions (by default, PostgreSQL)
-- `./platform/migrations` folder with migration files (used with [golang-migrate/migrate](https://github.com/golang-migrate/migrate) tool)
+# Run migrations
+make goose.up
 
-## ⚙️ Configuration
+# Generate Swagger docs
+make swag
+
+# Run application
+go run cmd/main.go
+```
+
+## Project Structure
+
+```
+agent-c/
+├── cmd/                      # Application entry point
+│   ├── main.go              # Main entry
+│   └── configs/             # Server configs
+├── app/                      # Business logic
+│   ├── middleware/          # HTTP middleware
+│   ├── types/               # Domain models
+│   ├── service/             # Business logic
+│   │   └── model-providers/ # AI provider integrations
+│   ├── routes/              # Route definitions
+│   ├── store/               # Data access layer
+│   │   ├── postgres/        # PostgreSQL implementation
+│   │   ├── blockchain/      # Ethereum client
+│   │   └── cache/           # Redis cache
+│   ├── utils/               # Utility functions
+│   └── contracts/           # Smart contract bindings
+├── migrations/              # Database migrations
+├── docs/                    # Swagger documentation
+└── scripts/                 # Utility scripts
+```
+
+## API Endpoints
+
+### AI Models
+
+- `GET /api/v1/ai/models` - List all available models
+- `POST /api/v1/ai/models` - Create a new model configuration
+- `POST /api/v1/ai/chat` - Send chat completion request
+
+### Documentation
+
+- `GET /swagger/*` - Swagger UI
+
+## Configuration
+
+Key environment variables (see `.env.example` for full list):
 
 ```ini
-# .env
-
-# Stage status to start server:
-#   - "dev", for start server without graceful shutdown
-#   - "prod", for start server with graceful shutdown
-STAGE_STATUS="dev"
-
-# Server settings:
-SERVER_HOST="0.0.0.0"
+# Server
+STAGE_STATUS=dev              # dev or prod
 SERVER_PORT=5000
-SERVER_READ_TIMEOUT=60
 
-# JWT settings:
-JWT_SECRET_KEY="secret"
-JWT_SECRET_KEY_EXPIRE_MINUTES_COUNT=15
-JWT_REFRESH_KEY="refresh"
-JWT_REFRESH_KEY_EXPIRE_HOURS_COUNT=720
-
-# Database settings:
-DB_TYPE="pgx"   # pgx or mysql
-DB_HOST="cgapp-postgres"
+# Database
+DB_HOST=host.docker.internal
 DB_PORT=5432
-DB_USER="postgres"
-DB_PASSWORD="password"
-DB_NAME="postgres"
-DB_SSL_MODE="disable"
-DB_MAX_CONNECTIONS=100
-DB_MAX_IDLE_CONNECTIONS=10
-DB_MAX_LIFETIME_CONNECTIONS=2
+DB_USER=postgres
+DB_PASSWORD=password
+DB_NAME=postgres
 
-# Redis settings:
-REDIS_HOST="cgapp-redis"
+# Redis
+REDIS_HOST=host.docker.internal
 REDIS_PORT=6379
-REDIS_PASSWORD=""
-REDIS_DB_NUMBER=0
+
+# JWT
+JWT_SECRET_KEY=your-secret-key
+JWT_REFRESH_KEY=your-refresh-key
+
+# Blockchain (optional)
+ETHEREUM_RPC_URL=https://mainnet.infura.io/v3/YOUR-KEY
+ETHEREUM_PRIVATE_KEY=your-private-key-hex
 ```
 
-## ⚠️ License
+## Smart Contracts
 
-Apache 2.0 &copy; [Vic Shóstak](https://shostak.dev/) & [True web artisans](https://1wa.co/).
+Generate Go bindings from Solidity contracts:
+
+```bash
+# Compile contract
+cd app/contracts
+solc --abi --bin YourContract.sol -o build/
+
+# Generate Go bindings
+abigen --abi=build/YourContract.abi \
+       --bin=build/YourContract.bin \
+       --pkg=contracts \
+       --out=your_contract.go
+```
+
+See `app/contracts/README.md` for detailed instructions.
+
+## Testing & Quality
+
+```bash
+# Run full test suite with coverage
+make test
+
+# Code quality checks
+make critic
+
+# Security scan
+make security
+
+# Linting
+make lint
+
+# Build for production
+make build
+```
+
+## Docker Commands
+
+```bash
+# Docker Compose
+make compose.up         # Start all services
+make compose.down       # Stop all services
+make compose.logs       # View logs
+make compose.restart    # Restart backend
+make compose.rebuild    # Rebuild backend
+
+# Individual services
+make docker.postgres    # Start PostgreSQL
+make docker.redis       # Start Redis
+make docker.stop        # Stop all containers
+```
+
+## Architecture
+
+Agent-C follows **Clean Architecture** principles:
+
+- **Service Layer**: Business logic in `app/service/`
+- **Repository Pattern**: Data access abstracted via `SqlStore` interface
+- **Dependency Injection**: Dependencies injected through constructors
+- **Middleware Chain**: JWT auth, logging, error handling
+
+### Database Schema
+
+- **providers** - AI model provider configurations
+- **model_schemas** - JSON schemas for model options/responses
+- **models** - Registry of available AI models
+- **sellers** - API key providers (wallet-based)
+- **consumers** - API key users (wallet-based)
+- **api_keys** - Access keys with token tracking
+
+## Adding Features
+
+### New AI Provider
+
+1. Create implementation in `app/service/model-providers/`
+2. Define types in `app/types/`
+3. Update routing in `app/service/consume.go`
+4. Add provider to database
+
+### New Endpoint
+
+1. Add handler to `app/service/`
+2. Register route in `app/routes/impl.go`
+3. Add Swagger annotations
+4. Run `make swag`
+
+### Blockchain Integration
+
+1. Write Solidity contract in `app/contracts/`
+2. Compile and generate bindings
+3. Use `EthereumClient` from `app/store/blockchain/`
+
+## Error Handling
+
+Standard JSON responses:
+
+```json
+// Error
+{
+  "error": true,
+  "msg": "error message"
+}
+
+// Success
+{
+  "error": false,
+  "msg": null,
+  "data": {}
+}
+```
+
+## Documentation
+
+For detailed documentation, see:
+- **[claude.md](./claude.md)** - Complete project context and architecture
+- **[app/contracts/README.md](./app/contracts/README.md)** - Smart contract guide
+- **Swagger UI** - http://localhost:8080/swagger/index.html (when running)
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Run tests: `make test`
+5. Submit a pull request
+
+## License
+
+Apache 2.0 © [William Bryce](https://github.com/wmbryce)
+
+## Support
+
+- Issues: [GitHub Issues](https://github.com/wmbryce/agent-c/issues)
+- Documentation: See `claude.md` for comprehensive guide
