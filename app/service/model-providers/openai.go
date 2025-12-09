@@ -22,7 +22,7 @@ import (
 // @Router /v1/openai/chat [post]
 func ChatCompletion(c *fiber.Ctx) error {
 	// Create new ChatCompletionRequest struct
-	request := &types.ChatCompletionRequest{}
+	request := &types.ConsumeModelRequest{}
 
 	// Check, if received JSON data is valid.
 	if err := c.BodyParser(request); err != nil {
@@ -122,4 +122,3 @@ func ChatCompletion(c *fiber.Ctx) error {
 		"response": response,
 	})
 }
-

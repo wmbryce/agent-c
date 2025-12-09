@@ -2,10 +2,19 @@ package types
 
 import "time"
 
-type ChatCompletionRequest struct {
-	ModelKey       string          `json:"model_key" validate:"required"`
-	Messages       []ChatMessage   `json:"messages" validate:"required,min=1,dive"`
-	Options        map[string]interface{} `json:"options,omitempty"`
+type ConsumeModelRequest struct {
+	ModelKey string                 `json:"model_key" validate:"required"`
+	Messages []ChatMessage          `json:"messages" validate:"required,min=1,dive"`
+	Options  map[string]interface{} `json:"options,omitempty"`
+	MaxCost  float64                `json:"max_cost" validate:"required,gt=0"`
+}
+
+type ModelCredentials struct {
+	ModelKey        string `json:"model_key"`
+	RequestURL      string `json:"request_url"`
+	ApiKey          string `json:"api_key"`
+	TokensAvailable int    `json:"tokens_available"`
+	ProviderName    string `json:"provider_name"`
 }
 
 type Model struct {

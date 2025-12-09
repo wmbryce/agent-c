@@ -18,7 +18,7 @@ func (r *Routes) Setup(app *fiber.App) {
 	v1 := app.Group("api/v1")
 	v1.Get("/ai/models", r.service.GetModels)
 	v1.Post("/ai/models", r.service.CreateModel)
-	v1.Post("/ai/chat", service.ConsumeModel)
+	v1.Post("/ai/consume", r.service.ConsumeModel)
 	swaggerRoute := app.Group("/swagger")
 	swaggerRoute.Get("*", swagger.HandlerDefault)
 

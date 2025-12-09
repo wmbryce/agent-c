@@ -98,3 +98,30 @@ func (s *Store) GetModels() ([]types.Model, error) {
 
 	return models, nil
 }
+
+func (s *Store) GetModelCredentials(modelKey string) (*types.ModelCredentials, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	query := `
+		SELECT m.model_key, m.request_url, ak.api_key, ak.tokens_available, p.name
+		FROM agc.models m
+		JOIN agc.providers p ON m.provider_id = p.id
+		JOIN agc.api_keys ak ON ak.provider_id = p.id
+		WHERE m.model_key = $1
+	`
+
+	var creds types.ModelCredentials
+	err := s.db.QueryRow(ctx, query, modelKey).Scan(
+		&creds.ModelKey,
+		&creds.RequestURL,
+		&creds.ApiKey,
+		&creds.TokensAvailable,
+		&creds.ProviderName,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get model credentials: %w", err)
+	}
+
+	return &creds, nil
+}
