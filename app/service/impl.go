@@ -1,17 +1,40 @@
 package service
 
 import (
+	"net/http"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/rs/zerolog"
 	"github.com/wmbryce/agent-c/app/store"
 )
 
+// HTTPClient interface for making HTTP requests (allows mocking in tests)
+type HTTPClient interface {
+	Do(req *http.Request) (*http.Response, error)
+}
+
 type Service struct {
-	logger *zerolog.Logger
-	store  store.SqlStore
-	fiber  *fiber.App
+	logger     *zerolog.Logger
+	store      store.SqlStore
+	fiber      *fiber.App
+	httpClient HTTPClient
 }
 
 func New(logger *zerolog.Logger, sqlStore store.SqlStore, fiber *fiber.App) *Service {
-	return &Service{logger: logger, store: sqlStore, fiber: fiber}
+	return &Service{
+		logger:     logger,
+		store:      sqlStore,
+		fiber:      fiber,
+		httpClient: &http.Client{},
+	}
+}
+
+// NewWithClient creates a Service with a custom HTTP client (useful for testing)
+func NewWithClient(logger *zerolog.Logger, sqlStore store.SqlStore, fiber *fiber.App, client HTTPClient) *Service {
+	return &Service{
+		logger:     logger,
+		store:      sqlStore,
+		fiber:      fiber,
+		httpClient: client,
+	}
 }

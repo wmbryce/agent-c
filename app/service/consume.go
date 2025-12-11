@@ -84,8 +84,7 @@ func (s *Service) ConsumeModel(c *fiber.Ctx) error {
 	httpReq.Header.Set("Content-Type", "application/json")
 	httpReq.Header.Set("Authorization", "Bearer "+creds.ApiKey)
 
-	client := &http.Client{}
-	resp, err := client.Do(httpReq)
+	resp, err := s.httpClient.Do(httpReq)
 	if err != nil {
 		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{
 			"error": true,
