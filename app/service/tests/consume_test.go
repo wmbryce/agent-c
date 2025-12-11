@@ -172,7 +172,7 @@ func TestConsumeModel(t *testing.T) {
 
 			// Create Fiber app and service
 			app := fiber.New()
-			svc := service.NewWithClient(&logger, store, app, httpClient)
+			svc := service.New(&logger, store, app, httpClient)
 
 			// Register route
 			app.Post("/api/v1/ai/consume", svc.ConsumeModel)

@@ -41,7 +41,7 @@ func main() {
 	app := fiber.New(configs.FiberConfig())
 	middleware.FiberMiddleware(app)
 
-	svc := service.New(&logger, sqlStore, app)
+	svc := service.New(&logger, sqlStore, app, nil)
 	routes.New(svc).Setup(app)
 
 	if os.Getenv("STAGE_STATUS") == "dev" {

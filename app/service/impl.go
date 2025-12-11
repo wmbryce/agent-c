@@ -20,17 +20,10 @@ type Service struct {
 	httpClient HTTPClient
 }
 
-func New(logger *zerolog.Logger, sqlStore store.SqlStore, fiber *fiber.App) *Service {
-	return &Service{
-		logger:     logger,
-		store:      sqlStore,
-		fiber:      fiber,
-		httpClient: &http.Client{},
+func New(logger *zerolog.Logger, sqlStore store.SqlStore, fiber *fiber.App, client HTTPClient) *Service {
+	if client == nil {
+		client = &http.Client{}
 	}
-}
-
-// NewWithClient creates a Service with a custom HTTP client (useful for testing)
-func NewWithClient(logger *zerolog.Logger, sqlStore store.SqlStore, fiber *fiber.App, client HTTPClient) *Service {
 	return &Service{
 		logger:     logger,
 		store:      sqlStore,
