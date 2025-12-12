@@ -76,5 +76,5 @@ DROP TABLE IF EXISTS agc.providers;
 DROP TABLE IF EXISTS agc.sellers;
 DROP TABLE IF EXISTS agc.consumers;
 
-DROP SCHEMA IF EXISTS agc;
+DROP SCHEMA IF EXISTS agc CASCADE;
 -- +goose StatementEnd

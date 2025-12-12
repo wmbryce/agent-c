@@ -13,7 +13,7 @@ Agent-C is a Go-based AI model aggregation and blockchain integration platform. 
 - **Blockchain**: Ethereum integration via go-ethereum
 - **AI Integration**: OpenAI API via sashabaranov/go-openai
 - **Authentication**: JWT tokens via golang-jwt/jwt
-- **API Documentation**: Swagger/OpenAPI via swaggo/swag
+- **API Documentation**: Scalar/OpenAPI via swaggo/swag
 - **Validation**: go-playground/validator
 - **Logging**: zerolog
 - **Migrations**: Goose
@@ -67,7 +67,7 @@ agent-c/
 │       └── ERC20.sol
 ├── migrations/              # Database migrations
 │   └── 20251204040426_init_tables.sql
-├── docs/                    # Swagger API documentation
+├── docs/                    # Scalar API documentation
 │   └── swagger.json
 └── scripts/                 # Utility scripts
 
@@ -146,7 +146,7 @@ The application uses a PostgreSQL database with schema `agc`:
 
 ### Documentation
 
-- `GET /swagger/*` - Swagger UI for API documentation
+- `GET /docs/* - Scalar API Reference UI
 
 ## Environment Configuration
 
@@ -155,7 +155,7 @@ The application requires the following environment variables:
 ### Server Settings
 - `STAGE_STATUS` - "dev" or "prod" (controls graceful shutdown)
 - `SERVER_HOST` - Server host (default: 0.0.0.0)
-- `SERVER_PORT` - Server port (default: 5000)
+- `SERVER_PORT` - Server port (default: 8080)
 - `SERVER_READ_TIMEOUT` - Read timeout in seconds
 
 ### Database Settings (PostgreSQL)
@@ -336,7 +336,7 @@ All services connected via `dev-network` bridge network with health checks.
 
 ## API Documentation
 
-Swagger documentation available at: `http://localhost:5000/swagger/index.html`
+Scalar API Reference available at: `http://localhost:8080/docs`
 
 Auto-generated from code annotations using swaggo/swag.
 

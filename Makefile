@@ -3,8 +3,11 @@
 APP_NAME = apiserver
 BUILD_DIR = $(PWD)/build
 MIGRATIONS_DIR = $(PWD)/migrations
-DATABASE_URL = postgres://postgres:password@cgapp-postgres/postgres?sslmode=disable
-GOOSE = goose -dir $(MIGRATIONS_DIR) postgres "$(DATABASE_URL)"
+DATABASE_URL = postgres://postgres:password@localhost:5432/postgres?sslmode=disable
+
+export GOOSE_DRIVER=postgres
+export GOOSE_DBSTRING=$(DATABASE_URL)
+export GOOSE_MIGRATION_DIR=$(MIGRATIONS_DIR)
 
 clean:
 	rm -rf ./build
@@ -29,19 +32,19 @@ run: swag build
 	$(BUILD_DIR)/$(APP_NAME)
 
 goose.up:
-	$(GOOSE) up
+	goose up
 
 goose.down:
-	$(GOOSE) down
+	goose down
 
 goose.status:
-	$(GOOSE) status
+	goose status
 
 goose.create:
-	$(GOOSE) create $(name) sql
+	goose create $(name) sql
 
 goose.reset:
-	$(GOOSE) reset
+	goose reset
 
 docker.run: docker.network docker.postgres swag docker.fiber docker.redis goose.up
 
