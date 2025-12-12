@@ -11,3 +11,6 @@ build-errors.log
 
 # Environment variables
 .env
+
+# Local seed files with sensitive data
+*_seed_secrets*.sql
