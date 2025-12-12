@@ -1,10 +1,15 @@
 package routes
 
 import (
+	_ "embed"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/wmbryce/agent-c/app/service"
 	"github.com/yokeTH/gofiber-scalar/scalar/v2"
 )
+
+//go:embed swagger.json
+var swaggerJSON string
 
 type Routes struct {
 	service *service.Service
@@ -19,7 +24,10 @@ func (r *Routes) Setup(app *fiber.App) {
 	v1.Get("/ai/models", r.service.GetModels)
 	v1.Post("/ai/models", r.service.CreateModel)
 	v1.Post("/ai/consume", r.service.ConsumeModel)
-	app.Get("/docs/*", scalar.New())
+	app.Get("/docs/*", scalar.New(scalar.Config{
+		Title:             "Agent-C API",
+		FileContentString: swaggerJSON,
+	}))
 
 	app.Use(func(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{

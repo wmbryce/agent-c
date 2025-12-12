@@ -92,7 +92,8 @@ docker.stop.redis:
 	docker stop cgapp-redis
 
 swag:
-	swag init
+	swag init -g cmd/main.go
+	cp docs/swagger.json app/routes/swagger.json
 
 # Air hot reload commands
 air.install:

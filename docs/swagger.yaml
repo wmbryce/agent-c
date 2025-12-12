@@ -1,39 +1,10 @@
 basePath: /api
 definitions:
-  models.BlockInfoResponse:
-    properties:
-      block_number:
-        type: integer
-      chain_id:
-        type: integer
-    type: object
-  models.ChatCompletionRequest:
-    properties:
-      max_tokens:
-        minimum: 1
-        type: integer
-      messages:
-        items:
-          $ref: '#/definitions/models.ChatMessage'
-        minItems: 1
-        type: array
-      model:
-        type: string
-      stream:
-        type: boolean
-      temperature:
-        maximum: 2
-        minimum: 0
-        type: number
-    required:
-    - messages
-    - model
-    type: object
-  models.ChatCompletionResponse:
+  types.ChatCompletionResponse:
     properties:
       choices:
         items:
-          $ref: '#/definitions/models.Choice'
+          $ref: '#/definitions/types.Choice'
         type: array
       created:
         type: integer
@@ -44,9 +15,9 @@ definitions:
       object:
         type: string
       usage:
-        $ref: '#/definitions/models.Usage'
+        $ref: '#/definitions/types.Usage'
     type: object
-  models.ChatMessage:
+  types.ChatMessage:
     properties:
       content:
         type: string
@@ -60,47 +31,35 @@ definitions:
     - content
     - role
     type: object
-  models.Choice:
+  types.Choice:
     properties:
       finish_reason:
         type: string
       index:
         type: integer
       message:
-        $ref: '#/definitions/models.ChatMessage'
+        $ref: '#/definitions/types.ChatMessage'
     type: object
-  models.GetBalanceResponse:
+  types.ConsumeModelRequest:
     properties:
-      address:
+      max_cost:
+        type: number
+      messages:
+        items:
+          $ref: '#/definitions/types.ChatMessage'
+        minItems: 1
+        type: array
+      model_key:
         type: string
-      balance:
-        description: in wei
-        type: string
-      balance_eth:
-        description: in ETH
-        type: string
+      options:
+        additionalProperties: true
+        type: object
+    required:
+    - max_cost
+    - messages
+    - model_key
     type: object
-  models.TransactionReceiptResponse:
-    properties:
-      block_hash:
-        type: string
-      block_number:
-        type: integer
-      contract_address:
-        type: string
-      from:
-        type: string
-      gas_used:
-        type: integer
-      status:
-        description: 1 = success, 0 = failure
-        type: integer
-      to:
-        type: string
-      tx_hash:
-        type: string
-    type: object
-  models.Usage:
+  types.Usage:
     properties:
       completion_tokens:
         type: integer
@@ -121,150 +80,30 @@ info:
   title: API
   version: "1.0"
 paths:
-  /v1/ai/chat:
+  /v1/ai/consume:
     post:
       consumes:
       - application/json
-      description: Send a chat completion request to OpenAI API.
+      description: Send a consume model request to the AI provider.
       parameters:
-      - description: Chat completion request
+      - description: Consume model request
         in: body
         name: request
         required: true
         schema:
-          $ref: '#/definitions/models.ChatCompletionRequest'
+          $ref: '#/definitions/types.ConsumeModelRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.ChatCompletionResponse'
+            $ref: '#/definitions/types.ChatCompletionResponse'
       security:
       - ApiKeyAuth: []
-      summary: send a chat completion request to OpenAI
+      summary: consume an AI model
       tags:
-      - OpenAI
-  /v1/blockchain/balance:
-    post:
-      consumes:
-      - application/json
-      description: Get ETH balance of an address.
-      parameters:
-      - description: Ethereum address
-        in: body
-        name: address
-        required: true
-        schema:
-          type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.GetBalanceResponse'
-      security:
-      - ApiKeyAuth: []
-      summary: get ETH balance
-      tags:
-      - Blockchain
-  /v1/blockchain/info:
-    get:
-      consumes:
-      - application/json
-      description: Get current block number and chain ID.
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.BlockInfoResponse'
-      security:
-      - ApiKeyAuth: []
-      summary: get blockchain info
-      tags:
-      - Blockchain
-  /v1/blockchain/receipt:
-    post:
-      consumes:
-      - application/json
-      description: Get transaction receipt by hash.
-      parameters:
-      - description: Transaction hash
-        in: body
-        name: tx_hash
-        required: true
-        schema:
-          type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.TransactionReceiptResponse'
-      security:
-      - ApiKeyAuth: []
-      summary: get transaction receipt
-      tags:
-      - Blockchain
-  /v1/blockchain/send-ether:
-    post:
-      consumes:
-      - application/json
-      description: Send ETH to an address.
-      parameters:
-      - description: Recipient address
-        in: body
-        name: to
-        required: true
-        schema:
-          type: string
-      - description: Amount in ETH
-        in: body
-        name: amount
-        required: true
-        schema:
-          type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-      security:
-      - ApiKeyAuth: []
-      summary: send ETH
-      tags:
-      - Blockchain
-  /v1/openai/chat:
-    post:
-      consumes:
-      - application/json
-      description: Send a chat completion request to OpenAI API.
-      parameters:
-      - description: Chat completion request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/models.ChatCompletionRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.ChatCompletionResponse'
-      security:
-      - ApiKeyAuth: []
-      summary: send a chat completion request to OpenAI
-      tags:
-      - OpenAI
+      - AI
 securityDefinitions:
   ApiKeyAuth:
     in: header

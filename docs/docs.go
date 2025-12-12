@@ -23,14 +23,14 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/v1/ai/chat": {
+        "/v1/ai/consume": {
             "post": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Send a chat completion request to OpenAI API.",
+                "description": "Send a consume model request to the AI provider.",
                 "consumes": [
                     "application/json"
                 ],
@@ -38,17 +38,17 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "OpenAI"
+                    "AI"
                 ],
-                "summary": "send a chat completion request to OpenAI",
+                "summary": "consume an AI model",
                 "parameters": [
                     {
-                        "description": "Chat completion request",
+                        "description": "Consume model request",
                         "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.ChatCompletionRequest"
+                            "$ref": "#/definitions/types.ConsumeModelRequest"
                         }
                     }
                 ],
@@ -56,201 +56,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.ChatCompletionResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/v1/blockchain/balance": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Get ETH balance of an address.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Blockchain"
-                ],
-                "summary": "get ETH balance",
-                "parameters": [
-                    {
-                        "description": "Ethereum address",
-                        "name": "address",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.GetBalanceResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/v1/blockchain/info": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Get current block number and chain ID.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Blockchain"
-                ],
-                "summary": "get blockchain info",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.BlockInfoResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/v1/blockchain/receipt": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Get transaction receipt by hash.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Blockchain"
-                ],
-                "summary": "get transaction receipt",
-                "parameters": [
-                    {
-                        "description": "Transaction hash",
-                        "name": "tx_hash",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.TransactionReceiptResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/v1/blockchain/send-ether": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Send ETH to an address.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Blockchain"
-                ],
-                "summary": "send ETH",
-                "parameters": [
-                    {
-                        "description": "Recipient address",
-                        "name": "to",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "description": "Amount in ETH",
-                        "name": "amount",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/v1/openai/chat": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Send a chat completion request to OpenAI API.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "OpenAI"
-                ],
-                "summary": "send a chat completion request to OpenAI",
-                "parameters": [
-                    {
-                        "description": "Chat completion request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.ChatCompletionRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.ChatCompletionResponse"
+                            "$ref": "#/definitions/types.ChatCompletionResponse"
                         }
                     }
                 }
@@ -258,55 +64,13 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "models.BlockInfoResponse": {
-            "type": "object",
-            "properties": {
-                "block_number": {
-                    "type": "integer"
-                },
-                "chain_id": {
-                    "type": "integer"
-                }
-            }
-        },
-        "models.ChatCompletionRequest": {
-            "type": "object",
-            "required": [
-                "messages",
-                "model"
-            ],
-            "properties": {
-                "max_tokens": {
-                    "type": "integer",
-                    "minimum": 1
-                },
-                "messages": {
-                    "type": "array",
-                    "minItems": 1,
-                    "items": {
-                        "$ref": "#/definitions/models.ChatMessage"
-                    }
-                },
-                "model": {
-                    "type": "string"
-                },
-                "stream": {
-                    "type": "boolean"
-                },
-                "temperature": {
-                    "type": "number",
-                    "maximum": 2,
-                    "minimum": 0
-                }
-            }
-        },
-        "models.ChatCompletionResponse": {
+        "types.ChatCompletionResponse": {
             "type": "object",
             "properties": {
                 "choices": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/models.Choice"
+                        "$ref": "#/definitions/types.Choice"
                     }
                 },
                 "created": {
@@ -322,11 +86,11 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "usage": {
-                    "$ref": "#/definitions/models.Usage"
+                    "$ref": "#/definitions/types.Usage"
                 }
             }
         },
-        "models.ChatMessage": {
+        "types.ChatMessage": {
             "type": "object",
             "required": [
                 "content",
@@ -346,7 +110,7 @@ const docTemplate = `{
                 }
             }
         },
-        "models.Choice": {
+        "types.Choice": {
             "type": "object",
             "properties": {
                 "finish_reason": {
@@ -356,57 +120,38 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "message": {
-                    "$ref": "#/definitions/models.ChatMessage"
+                    "$ref": "#/definitions/types.ChatMessage"
                 }
             }
         },
-        "models.GetBalanceResponse": {
+        "types.ConsumeModelRequest": {
             "type": "object",
+            "required": [
+                "max_cost",
+                "messages",
+                "model_key"
+            ],
             "properties": {
-                "address": {
+                "max_cost": {
+                    "type": "number"
+                },
+                "messages": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "$ref": "#/definitions/types.ChatMessage"
+                    }
+                },
+                "model_key": {
                     "type": "string"
                 },
-                "balance": {
-                    "description": "in wei",
-                    "type": "string"
-                },
-                "balance_eth": {
-                    "description": "in ETH",
-                    "type": "string"
+                "options": {
+                    "type": "object",
+                    "additionalProperties": true
                 }
             }
         },
-        "models.TransactionReceiptResponse": {
-            "type": "object",
-            "properties": {
-                "block_hash": {
-                    "type": "string"
-                },
-                "block_number": {
-                    "type": "integer"
-                },
-                "contract_address": {
-                    "type": "string"
-                },
-                "from": {
-                    "type": "string"
-                },
-                "gas_used": {
-                    "type": "integer"
-                },
-                "status": {
-                    "description": "1 = success, 0 = failure",
-                    "type": "integer"
-                },
-                "to": {
-                    "type": "string"
-                },
-                "tx_hash": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.Usage": {
+        "types.Usage": {
             "type": "object",
             "properties": {
                 "completion_tokens": {
