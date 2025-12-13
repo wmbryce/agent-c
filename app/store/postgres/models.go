@@ -147,13 +147,19 @@ func (s *Store) GetModelCredentials(modelKey string) (*types.ModelCredentials, e
 		config.AuthHeader = *authHeader
 	}
 	if len(extraHeaders) > 0 {
-		json.Unmarshal(extraHeaders, &config.ExtraHeaders)
+		if err := json.Unmarshal(extraHeaders, &config.ExtraHeaders); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal extra_headers: %w", err)
+		}
 	}
 	if len(requestDefaults) > 0 {
-		json.Unmarshal(requestDefaults, &config.RequestDefaults)
+		if err := json.Unmarshal(requestDefaults, &config.RequestDefaults); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal request_defaults: %w", err)
+		}
 	}
 	if len(responseMapping) > 0 {
-		json.Unmarshal(responseMapping, &config.ResponseMapping)
+		if err := json.Unmarshal(responseMapping, &config.ResponseMapping); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal response_mapping: %w", err)
+		}
 	}
 
 	creds.ProviderConfig = config
