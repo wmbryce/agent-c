@@ -204,25 +204,29 @@ INSERT INTO agc.models (id, model_key, name, description, provider_id, options_s
 -- SEED ANTHROPIC MODELS
 -- =============================================
 
--- Claude 3.5 Series
+-- Claude 4.5 Series (Latest)
 INSERT INTO agc.models (id, model_key, name, description, provider_id, options_schema_id, response_schema_id, request_url) VALUES
-    ('00000002-0001-0001-0000-000000000001', 'claude-3-5-sonnet-latest', 'Claude 3.5 Sonnet (Latest)', 'Most intelligent Claude model. Highest level of intelligence and capability.', '00000000-0002-0000-0000-000000000001', '00000000-0002-0001-0000-000000000001', '00000000-0002-0002-0000-000000000001', 'https://api.anthropic.com/v1/messages'),
-    ('00000002-0001-0002-0000-000000000001', 'claude-3-5-sonnet-20241022', 'Claude 3.5 Sonnet (Oct 2024)', 'Claude 3.5 Sonnet snapshot from October 2024.', '00000000-0002-0000-0000-000000000001', '00000000-0002-0001-0000-000000000001', '00000000-0002-0002-0000-000000000001', 'https://api.anthropic.com/v1/messages'),
-    ('00000002-0001-0003-0000-000000000001', 'claude-3-5-sonnet-20240620', 'Claude 3.5 Sonnet (Jun 2024)', 'Claude 3.5 Sonnet snapshot from June 2024.', '00000000-0002-0000-0000-000000000001', '00000000-0002-0001-0000-000000000001', '00000000-0002-0002-0000-000000000001', 'https://api.anthropic.com/v1/messages'),
-    ('00000002-0001-0004-0000-000000000001', 'claude-3-5-haiku-latest', 'Claude 3.5 Haiku (Latest)', 'Fastest and most compact Claude model for near-instant responsiveness.', '00000000-0002-0000-0000-000000000001', '00000000-0002-0001-0000-000000000001', '00000000-0002-0002-0000-000000000001', 'https://api.anthropic.com/v1/messages'),
-    ('00000002-0001-0005-0000-000000000001', 'claude-3-5-haiku-20241022', 'Claude 3.5 Haiku (Oct 2024)', 'Claude 3.5 Haiku snapshot from October 2024.', '00000000-0002-0000-0000-000000000001', '00000000-0002-0001-0000-000000000001', '00000000-0002-0002-0000-000000000001', 'https://api.anthropic.com/v1/messages');
+    ('00000002-0001-0001-0000-000000000001', 'claude-sonnet-4-5-20250929', 'Claude Sonnet 4.5', 'Smart model for complex agents and coding. Best balance of intelligence, speed, and cost.', '00000000-0002-0000-0000-000000000001', '00000000-0002-0001-0000-000000000001', '00000000-0002-0002-0000-000000000001', 'https://api.anthropic.com/v1/messages'),
+    ('00000002-0001-0002-0000-000000000001', 'claude-haiku-4-5-20251001', 'Claude Haiku 4.5', 'Fastest model with near-frontier intelligence.', '00000000-0002-0000-0000-000000000001', '00000000-0002-0001-0000-000000000001', '00000000-0002-0002-0000-000000000001', 'https://api.anthropic.com/v1/messages'),
+    ('00000002-0001-0003-0000-000000000001', 'claude-opus-4-5-20251101', 'Claude Opus 4.5', 'Premium model combining maximum intelligence with practical performance.', '00000000-0002-0000-0000-000000000001', '00000000-0002-0001-0000-000000000001', '00000000-0002-0002-0000-000000000001', 'https://api.anthropic.com/v1/messages');
 
--- Claude 3 Series
+-- Claude 4 Series
 INSERT INTO agc.models (id, model_key, name, description, provider_id, options_schema_id, response_schema_id, request_url) VALUES
-    ('00000002-0002-0001-0000-000000000001', 'claude-3-opus-latest', 'Claude 3 Opus (Latest)', 'Powerful model for highly complex tasks with top-level performance.', '00000000-0002-0000-0000-000000000001', '00000000-0002-0001-0000-000000000001', '00000000-0002-0002-0000-000000000001', 'https://api.anthropic.com/v1/messages'),
-    ('00000002-0002-0002-0000-000000000001', 'claude-3-opus-20240229', 'Claude 3 Opus (Feb 2024)', 'Claude 3 Opus snapshot from February 2024.', '00000000-0002-0000-0000-000000000001', '00000000-0002-0001-0000-000000000001', '00000000-0002-0002-0000-000000000001', 'https://api.anthropic.com/v1/messages'),
-    ('00000002-0002-0003-0000-000000000001', 'claude-3-sonnet-20240229', 'Claude 3 Sonnet (Feb 2024)', 'Balance of intelligence and speed for enterprise workloads.', '00000000-0002-0000-0000-000000000001', '00000000-0002-0001-0000-000000000001', '00000000-0002-0002-0000-000000000001', 'https://api.anthropic.com/v1/messages'),
-    ('00000002-0002-0004-0000-000000000001', 'claude-3-haiku-20240307', 'Claude 3 Haiku (Mar 2024)', 'Fastest and most compact model for near-instant responsiveness.', '00000000-0002-0000-0000-000000000001', '00000000-0002-0001-0000-000000000001', '00000000-0002-0002-0000-000000000001', 'https://api.anthropic.com/v1/messages');
+    ('00000002-0002-0001-0000-000000000001', 'claude-opus-4-20250514', 'Claude Opus 4', 'Most powerful Claude 4 model for highly complex tasks.', '00000000-0002-0000-0000-000000000001', '00000000-0002-0001-0000-000000000001', '00000000-0002-0002-0000-000000000001', 'https://api.anthropic.com/v1/messages'),
+    ('00000002-0002-0002-0000-000000000001', 'claude-sonnet-4-20250514', 'Claude Sonnet 4', 'High intelligence model balancing capability with speed.', '00000000-0002-0000-0000-000000000001', '00000000-0002-0001-0000-000000000001', '00000000-0002-0002-0000-000000000001', 'https://api.anthropic.com/v1/messages'),
+    ('00000002-0002-0003-0000-000000000001', 'claude-opus-4-1-20250805', 'Claude Opus 4.1', 'Enhanced Opus 4 with improved capabilities.', '00000000-0002-0000-0000-000000000001', '00000000-0002-0001-0000-000000000001', '00000000-0002-0002-0000-000000000001', 'https://api.anthropic.com/v1/messages');
 
--- Claude 4 Series (Latest)
+-- Claude 3.7 Series
 INSERT INTO agc.models (id, model_key, name, description, provider_id, options_schema_id, response_schema_id, request_url) VALUES
-    ('00000002-0003-0001-0000-000000000001', 'claude-opus-4-20250514', 'Claude Opus 4', 'Most powerful Claude model. Exceptional at complex reasoning, coding, and agentic tasks.', '00000000-0002-0000-0000-000000000001', '00000000-0002-0001-0000-000000000001', '00000000-0002-0002-0000-000000000001', 'https://api.anthropic.com/v1/messages'),
-    ('00000002-0003-0002-0000-000000000001', 'claude-sonnet-4-20250514', 'Claude Sonnet 4', 'High intelligence model balancing capability with speed for demanding tasks.', '00000000-0002-0000-0000-000000000001', '00000000-0002-0001-0000-000000000001', '00000000-0002-0002-0000-000000000001', 'https://api.anthropic.com/v1/messages');
+    ('00000002-0003-0001-0000-000000000001', 'claude-3-7-sonnet-20250219', 'Claude 3.7 Sonnet', 'Claude 3.7 Sonnet with extended thinking support.', '00000000-0002-0000-0000-000000000001', '00000000-0002-0001-0000-000000000001', '00000000-0002-0002-0000-000000000001', 'https://api.anthropic.com/v1/messages');
+
+-- Claude 3.5 Series (Legacy)
+INSERT INTO agc.models (id, model_key, name, description, provider_id, options_schema_id, response_schema_id, request_url) VALUES
+    ('00000002-0004-0001-0000-000000000001', 'claude-3-5-haiku-20241022', 'Claude 3.5 Haiku', 'Fast and compact model for near-instant responsiveness.', '00000000-0002-0000-0000-000000000001', '00000000-0002-0001-0000-000000000001', '00000000-0002-0002-0000-000000000001', 'https://api.anthropic.com/v1/messages');
+
+-- Claude 3 Series (Legacy)
+INSERT INTO agc.models (id, model_key, name, description, provider_id, options_schema_id, response_schema_id, request_url) VALUES
+    ('00000002-0005-0001-0000-000000000001', 'claude-3-haiku-20240307', 'Claude 3 Haiku', 'Fastest and most compact legacy model.', '00000000-0002-0000-0000-000000000001', '00000000-0002-0001-0000-000000000001', '00000000-0002-0002-0000-000000000001', 'https://api.anthropic.com/v1/messages');
 
 -- +goose StatementEnd
 

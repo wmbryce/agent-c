@@ -64,6 +64,11 @@ func (s *Service) ConsumeModel(c *fiber.Ctx) error {
 		providerRequest[k] = v
 	}
 
+	// Apply provider-specific request defaults
+	if creds.ProviderConfig != nil {
+		utils.ApplyRequestDefaults(providerRequest, creds.ProviderConfig.RequestDefaults)
+	}
+
 	payload, err := json.Marshal(providerRequest)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
@@ -82,7 +87,9 @@ func (s *Service) ConsumeModel(c *fiber.Ctx) error {
 	}
 
 	httpReq.Header.Set("Content-Type", "application/json")
-	httpReq.Header.Set("Authorization", "Bearer "+creds.ApiKey)
+
+	// Set provider-specific headers using config
+	utils.SetProviderHeaders(httpReq, creds.ProviderConfig, creds.ApiKey)
 
 	resp, err := s.httpClient.Do(httpReq)
 	if err != nil {
@@ -101,13 +108,45 @@ func (s *Service) ConsumeModel(c *fiber.Ctx) error {
 		})
 	}
 
-	// Parse the provider response
-	var response types.ChatCompletionResponse
-	if err := json.Unmarshal(body, &response); err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+	// Check if the provider returned an error status
+	if resp.StatusCode != http.StatusOK {
+		s.logger.Error().
+			Int("status_code", resp.StatusCode).
+			Str("body", string(body)).
+			Msg("model provider returned error")
+		return c.Status(resp.StatusCode).JSON(fiber.Map{
 			"error": true,
-			"msg":   "failed to parse provider response",
+			"msg":   "model provider error: " + string(body),
 		})
+	}
+
+	// Transform the provider response to GeneralChatResponse
+	var response *types.GeneralChatResponse
+	if creds.ProviderConfig != nil && len(creds.ProviderConfig.ResponseMapping) > 0 {
+		response, err = utils.TransformResponse(body, creds.ProviderConfig.ResponseMapping)
+		if err != nil {
+			s.logger.Error().
+				Err(err).
+				Str("body", string(body)).
+				Msg("failed to transform provider response")
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"error": true,
+				"msg":   "failed to parse provider response",
+			})
+		}
+	} else {
+		// Fallback: try to parse as GeneralChatResponse directly
+		response = &types.GeneralChatResponse{}
+		if err := json.Unmarshal(body, response); err != nil {
+			s.logger.Error().
+				Err(err).
+				Str("body", string(body)).
+				Msg("failed to parse provider response")
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"error": true,
+				"msg":   "failed to parse provider response",
+			})
+		}
 	}
 
 	return c.JSON(fiber.Map{

@@ -10,11 +10,31 @@ type ConsumeModelRequest struct {
 }
 
 type ModelCredentials struct {
-	ModelKey        string `json:"model_key"`
-	RequestURL      string `json:"request_url"`
-	ApiKey          string `json:"api_key"`
-	TokensAvailable int    `json:"tokens_available"`
-	ProviderName    string `json:"provider_name"`
+	ModelKey        string          `json:"model_key"`
+	RequestURL      string          `json:"request_url"`
+	ApiKey          string          `json:"api_key"`
+	TokensAvailable int             `json:"tokens_available"`
+	ProviderName    string          `json:"provider_name"`
+	ProviderConfig  *ProviderConfig `json:"provider_config"`
+}
+
+type ProviderConfig struct {
+	AuthType        string            `json:"auth_type"`
+	AuthHeader      string            `json:"auth_header"`
+	ExtraHeaders    map[string]string `json:"extra_headers"`
+	RequestDefaults map[string]any    `json:"request_defaults"`
+	ResponseMapping map[string]string `json:"response_mapping"`
+}
+
+type GeneralChatResponse struct {
+	ID               string `json:"id"`
+	Model            string `json:"model"`
+	Content          string `json:"content"`
+	Role             string `json:"role"`
+	FinishReason     string `json:"finish_reason"`
+	PromptTokens     int    `json:"prompt_tokens"`
+	CompletionTokens int    `json:"completion_tokens"`
+	TotalTokens      int    `json:"total_tokens"`
 }
 
 type Model struct {
