@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -104,7 +105,8 @@ func (s *Store) GetModelCredentials(modelKey string) (*types.ModelCredentials, e
 	defer cancel()
 
 	query := `
-		SELECT m.model_key, m.request_url, ak.api_key, ak.tokens_available, p.name
+		SELECT m.model_key, m.request_url, ak.api_key, ak.tokens_available, p.name,
+		       p.auth_type, p.auth_header, p.extra_headers, p.request_defaults, p.response_mapping
 		FROM agc.models m
 		JOIN agc.providers p ON m.provider_id = p.id
 		JOIN agc.api_keys ak ON ak.provider_id = p.id
@@ -112,16 +114,55 @@ func (s *Store) GetModelCredentials(modelKey string) (*types.ModelCredentials, e
 	`
 
 	var creds types.ModelCredentials
+	var authType, authHeader *string
+	var extraHeaders, requestDefaults, responseMapping []byte
+
 	err := s.db.QueryRow(ctx, query, modelKey).Scan(
 		&creds.ModelKey,
 		&creds.RequestURL,
 		&creds.ApiKey,
 		&creds.TokensAvailable,
 		&creds.ProviderName,
+		&authType,
+		&authHeader,
+		&extraHeaders,
+		&requestDefaults,
+		&responseMapping,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get model credentials: %w", err)
 	}
+
+	// Parse provider config
+	config := &types.ProviderConfig{
+		ExtraHeaders:    make(map[string]string),
+		RequestDefaults: make(map[string]any),
+		ResponseMapping: make(map[string]string),
+	}
+
+	if authType != nil {
+		config.AuthType = *authType
+	}
+	if authHeader != nil {
+		config.AuthHeader = *authHeader
+	}
+	if len(extraHeaders) > 0 {
+		if err := json.Unmarshal(extraHeaders, &config.ExtraHeaders); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal extra_headers: %w", err)
+		}
+	}
+	if len(requestDefaults) > 0 {
+		if err := json.Unmarshal(requestDefaults, &config.RequestDefaults); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal request_defaults: %w", err)
+		}
+	}
+	if len(responseMapping) > 0 {
+		if err := json.Unmarshal(responseMapping, &config.ResponseMapping); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal response_mapping: %w", err)
+		}
+	}
+
+	creds.ProviderConfig = config
 
 	return &creds, nil
 }
