@@ -1,0 +1,120 @@
+---
+version: "2.0"
+
+services:
+  backend:
+    image: ghcr.io/wmbryce/agent-c:latest
+    env:
+      - STAGE_STATUS=prod
+      - SERVER_HOST=0.0.0.0
+      - SERVER_PORT=8080
+      - SERVER_READ_TIMEOUT=60
+      - DB_TYPE=pgx
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=agentc
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=agentc
+      - DB_SSL_MODE=disable
+      - DB_MAX_CONNECTIONS=100
+      - DB_MAX_IDLE_CONNECTIONS=10
+      - DB_MAX_LIFETIME_CONNECTIONS=2
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - JWT_SECRET_KEY_EXPIRE_MINUTES_COUNT=15
+      - JWT_REFRESH_KEY=${JWT_REFRESH_KEY}
+      - JWT_REFRESH_KEY_EXPIRE_HOURS_COUNT=720
+    depends_on:
+      - service: postgres
+      - service: redis
+    expose:
+      - port: 8080
+        as: 80
+        to:
+          - global: true
+
+  postgres:
+    image: postgres:16-alpine
+    env:
+      - POSTGRES_USER=agentc
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=agentc
+    expose:
+      - port: 5432
+        to:
+          - service: backend
+    params:
+      storage:
+        data:
+          mount: /var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    command:
+      - "sh"
+      - "-c"
+      - "redis-server --requirepass ${REDIS_PASSWORD}"
+    expose:
+      - port: 6379
+        to:
+          - service: backend
+
+profiles:
+  compute:
+    backend:
+      resources:
+        cpu:
+          units: 2
+        memory:
+          size: 2Gi
+        storage:
+          - size: 1Gi
+    postgres:
+      resources:
+        cpu:
+          units: 1
+        memory:
+          size: 1Gi
+        storage:
+          - name: data
+            size: 10Gi
+            attributes:
+              persistent: true
+              class: beta3
+    redis:
+      resources:
+        cpu:
+          units: 0.5
+        memory:
+          size: 512Mi
+        storage:
+          - size: 1Gi
+
+  placement:
+    akash:
+      pricing:
+        backend:
+          denom: uakt
+          amount: 10000
+        postgres:
+          denom: uakt
+          amount: 10000
+        redis:
+          denom: uakt
+          amount: 5000
+
+deployment:
+  backend:
+    akash:
+      profile: backend
+      count: 1
+  postgres:
+    akash:
+      profile: postgres
+      count: 1
+  redis:
+    akash:
+      profile: redis
+      count: 1

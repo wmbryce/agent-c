@@ -14,3 +14,7 @@ build-errors.log
 
 # Local seed files with sensitive data
 *_seed_secrets*.sql
+
+# Akash deployment secrets
+deploy/akash/secrets.env
+deploy/akash/deploy-final.yaml
