@@ -106,7 +106,7 @@ func (s *Store) GetModelCredentials(modelKey string) (*types.ModelCredentials, e
 
 	query := `
 		SELECT m.model_key, m.request_url, ak.api_key, ak.tokens_available, p.name,
-		       p.auth_type, p.auth_header, p.extra_headers, p.request_defaults, p.response_mapping
+		       p.auth_type, p.auth_header, p.extra_headers, p.request_defaults, p.response_mapping, p.request_schema
 		FROM agc.models m
 		JOIN agc.providers p ON m.provider_id = p.id
 		JOIN agc.api_keys ak ON ak.provider_id = p.id
@@ -115,7 +115,7 @@ func (s *Store) GetModelCredentials(modelKey string) (*types.ModelCredentials, e
 
 	var creds types.ModelCredentials
 	var authType, authHeader *string
-	var extraHeaders, requestDefaults, responseMapping []byte
+	var extraHeaders, requestDefaults, responseMapping, requestSchema []byte
 
 	err := s.db.QueryRow(ctx, query, modelKey).Scan(
 		&creds.ModelKey,
@@ -128,6 +128,7 @@ func (s *Store) GetModelCredentials(modelKey string) (*types.ModelCredentials, e
 		&extraHeaders,
 		&requestDefaults,
 		&responseMapping,
+		&requestSchema,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get model credentials: %w", err)
@@ -159,6 +160,12 @@ func (s *Store) GetModelCredentials(modelKey string) (*types.ModelCredentials, e
 	if len(responseMapping) > 0 {
 		if err := json.Unmarshal(responseMapping, &config.ResponseMapping); err != nil {
 			return nil, fmt.Errorf("failed to unmarshal response_mapping: %w", err)
+		}
+	}
+	if len(requestSchema) > 0 {
+		config.RequestSchema = &types.RequestSchema{}
+		if err := json.Unmarshal(requestSchema, config.RequestSchema); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal request_schema: %w", err)
 		}
 	}
 

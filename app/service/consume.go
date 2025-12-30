@@ -55,14 +55,8 @@ func (s *Service) ConsumeModel(c *fiber.Ctx) error {
 		})
 	}
 
-	// Build the request payload for the provider
-	providerRequest := map[string]interface{}{
-		"model":    request.ModelKey,
-		"messages": request.Messages,
-	}
-	for k, v := range request.Options {
-		providerRequest[k] = v
-	}
+	// Build the request payload for the provider using provider-specific format
+	providerRequest := utils.TransformRequest(request.ModelKey, request.Messages, request.Options, creds.ProviderConfig)
 
 	// Apply provider-specific request defaults
 	if creds.ProviderConfig != nil {

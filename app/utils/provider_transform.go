@@ -129,3 +129,145 @@ func toInt(value interface{}) int {
 	}
 	return 0
 }
+
+// TransformRequest converts the standard request format to provider-specific format using RequestSchema
+func TransformRequest(modelKey string, messages []types.ChatMessage, options map[string]interface{}, config *types.ProviderConfig) map[string]interface{} {
+	// Default schema (OpenAI-compatible)
+	schema := &types.RequestSchema{
+		ModelField:    "model",
+		MessagesField: "messages",
+	}
+
+	if config != nil && config.RequestSchema != nil {
+		schema = config.RequestSchema
+	}
+
+	request := make(map[string]interface{})
+
+	// Add model field if specified
+	if schema.ModelField != "" {
+		request[schema.ModelField] = modelKey
+	}
+
+	// Transform and add messages
+	transformedMessages := transformMessages(messages, schema.MessageTransform)
+	if schema.MessagesField != "" {
+		request[schema.MessagesField] = transformedMessages
+	}
+
+	// Transform and add options
+	transformedOptions := transformOptions(options, schema)
+	if schema.OptionsWrapper != "" {
+		// Wrap options in a nested object
+		if len(transformedOptions) > 0 {
+			request[schema.OptionsWrapper] = transformedOptions
+		}
+	} else {
+		// Add options directly to request
+		for k, v := range transformedOptions {
+			request[k] = v
+		}
+	}
+
+	return request
+}
+
+// transformMessages applies MessageTransform to each message
+func transformMessages(messages []types.ChatMessage, transform *types.MessageTransform) []map[string]interface{} {
+	result := make([]map[string]interface{}, 0, len(messages))
+
+	// Default transform settings
+	roleField := "role"
+	contentPath := "content"
+	var roleMap map[string]string
+
+	if transform != nil {
+		if transform.RoleField != "" {
+			roleField = transform.RoleField
+		}
+		if transform.ContentPath != "" {
+			contentPath = transform.ContentPath
+		}
+		roleMap = transform.RoleMap
+	}
+
+	for _, msg := range messages {
+		role := msg.Role
+		if roleMap != nil {
+			if mappedRole, ok := roleMap[role]; ok {
+				role = mappedRole
+			}
+		}
+
+		message := make(map[string]interface{})
+		message[roleField] = role
+
+		// Handle content path (e.g., "content" or "parts[].text")
+		setContentByPath(message, contentPath, msg.Content)
+
+		result = append(result, message)
+	}
+
+	return result
+}
+
+// setContentByPath sets content at the specified path
+// Supports simple paths ("content") and array paths ("parts[].text")
+func setContentByPath(message map[string]interface{}, path string, content string) {
+	// Check for array notation: "parts[].text"
+	if idx := indexOf(path, "[]."); idx != -1 {
+		arrayField := path[:idx]
+		nestedField := path[idx+3:]
+
+		message[arrayField] = []map[string]interface{}{
+			{nestedField: content},
+		}
+		return
+	}
+
+	// Simple field
+	message[path] = content
+}
+
+// indexOf returns the index of substr in s, or -1 if not found
+func indexOf(s, substr string) int {
+	for i := 0; i <= len(s)-len(substr); i++ {
+		if s[i:i+len(substr)] == substr {
+			return i
+		}
+	}
+	return -1
+}
+
+// transformOptions applies option renaming and filtering
+func transformOptions(options map[string]interface{}, schema *types.RequestSchema) map[string]interface{} {
+	if options == nil {
+		return nil
+	}
+
+	// Build set of options to omit
+	omitSet := make(map[string]bool)
+	for _, opt := range schema.OptionsOmit {
+		omitSet[opt] = true
+	}
+
+	result := make(map[string]interface{})
+	for k, v := range options {
+		// Skip omitted options
+		if omitSet[k] {
+			continue
+		}
+
+		// Rename if mapping exists
+		newKey := k
+		if schema.OptionsRename != nil {
+			if renamed, ok := schema.OptionsRename[k]; ok {
+				newKey = renamed
+			}
+		}
+
+		result[newKey] = v
+	}
+
+	return result
+}

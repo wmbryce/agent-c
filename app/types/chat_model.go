@@ -24,6 +24,40 @@ type ProviderConfig struct {
 	ExtraHeaders    map[string]string `json:"extra_headers"`
 	RequestDefaults map[string]any    `json:"request_defaults"`
 	ResponseMapping map[string]string `json:"response_mapping"`
+	RequestSchema   *RequestSchema    `json:"request_schema"`
+}
+
+// RequestSchema defines how to transform standard requests to provider-specific format
+type RequestSchema struct {
+	// ModelField is the field name for the model key (e.g., "model"). Empty/null to omit.
+	ModelField string `json:"model_field,omitempty"`
+
+	// MessagesField is the field name for the messages array (e.g., "messages", "contents")
+	MessagesField string `json:"messages_field"`
+
+	// MessageTransform defines how to transform each message
+	MessageTransform *MessageTransform `json:"message_transform,omitempty"`
+
+	// OptionsWrapper wraps all options in a nested object (e.g., "generationConfig")
+	OptionsWrapper string `json:"options_wrapper,omitempty"`
+
+	// OptionsRename maps standard option names to provider-specific names
+	OptionsRename map[string]string `json:"options_rename,omitempty"`
+
+	// OptionsOmit lists option names to exclude from the request
+	OptionsOmit []string `json:"options_omit,omitempty"`
+}
+
+// MessageTransform defines how to transform message structure
+type MessageTransform struct {
+	// RoleField is the field name for the role (default: "role")
+	RoleField string `json:"role_field,omitempty"`
+
+	// ContentPath is the path where content goes (e.g., "content" or "parts[].text")
+	ContentPath string `json:"content_path,omitempty"`
+
+	// RoleMap remaps role values (e.g., {"assistant": "model"})
+	RoleMap map[string]string `json:"role_map,omitempty"`
 }
 
 type GeneralChatResponse struct {
